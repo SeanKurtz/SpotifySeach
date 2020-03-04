@@ -58,7 +58,19 @@ class App extends React.Component {
     } else if (error) {
       mainContent = <h4>No match.</h4>;
     } else {
-      mainContent = <Card items={results} />;
+      mainContent = (
+        <div>
+          <p>
+            Found
+            {' '}
+            {' '}
+            {results.length}
+            {' '}
+            exact matches.
+          </p>
+          <Card items={results} />
+        </div>
+      );
     }
     return (
       <div className="w-90 mx-auto" style={{ width: '95%' }}>

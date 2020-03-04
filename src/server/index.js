@@ -105,8 +105,9 @@ app.get('/genre', (req, res) => {
       const queryStr = query.replace(/['"]+/g, '');
       // Remove inexact matches.
       const filteredItems = finalItems.filter(item => item.genres.includes(queryStr));
-      console.log(`Filtered items array contains ${filteredItems.length} items`);
+      console.log(`Exactly matched ${filteredItems.length} items`);
       // Remove unnecessary data.
+      filteredItems.sort;
       const smallerItems = filteredItems.map(item => (
         {
           name: item.name, popularity: item.popularity, id: item.id, followers: item.followers.total, genres: item.genres

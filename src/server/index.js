@@ -119,7 +119,11 @@ app.get('/genre', (req, res) => {
         smallerItems[i].genres[0] = queryStr;
       }
       console.log(`Sending ${smallerItems.length} items to client`);
-      res.json({ success: true, message: smallerItems });
+      if (smallerItems.length > 0) {
+        res.json({ success: true, message: smallerItems });
+      } else {
+        res.json({ success: false, message: 'No matches.' });
+      }
 
 
       /*

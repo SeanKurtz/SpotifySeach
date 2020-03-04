@@ -1,6 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import Table from './components/Table';
+import Card from './components/Card';
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import './app.css';
 
@@ -30,18 +31,35 @@ class App extends React.Component {
   }
 
   handleSubmit(e) {
-    const { query } = this.state;
+    const { query, } = this.state;
     const queryStr = `http://localhost:8080/genre?query=%22${query}%22`;
     this.setState({ loading: true });
     axios.get(queryStr).then((res) => {
       const { data } = res;
-      console.log(data.message);
-      this.setState({ results: data.message, loading: false });
+      console.log(data);
+      if (data.success) {
+        this.setState({ results: data.message, loading: false, error: false });
+      } else if (data.message.length === 0 || !data.success) {
+        this.setState({ results: [], loading: false, error: true });
+      }
+    }).catch((err) => {
+      console.log(err);
+      this.setState({ results: [], loading: false, error: true });
     });
   }
 
   render() {
-    const { results, query, loading } = this.state;
+    const {
+      results, query, loading, error
+    } = this.state;
+    let mainContent = <h4>...</h4>;
+    if (loading) {
+      mainContent = <h4>Loading...</h4>;
+    } else if (error) {
+      mainContent = <h4>No match.</h4>;
+    } else {
+      mainContent = <Card items={results} />;
+    }
     return (
       <div className="w-90 mx-auto" style={{ width: '95%' }}>
         <form className="mt-4 mb-4">
@@ -64,7 +82,7 @@ class App extends React.Component {
             </div>
           </div>
         </form>
-        {loading ? <h4>Loading...</h4> : <Table items={results} />}
+        {mainContent}
       </div>
     );
   }

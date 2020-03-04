@@ -1,18 +1,33 @@
 import React from 'react';
 
-const Card = ({ name, popularity, genres }) => {
-  const genreStr = genres.join(', ');
-  return (
-    <div className="list-group-item">
-      <h5>{name}</h5>
-      <h6>{`Popularity: ${popularity}`}</h6>
-      <h6 className="d-inline">Genres: </h6>
-      <p className="d-inline">{genreStr}</p>
-    </div>
-  );
-};
+const Card = ({
+  items
+}) => (
+  <table className="table">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Popularity</th>
+        <th scope="col">Followers</th>
+        <th scope="col">Spotify Id</th>
+        <th scope="col">Genres</th>
+      </tr>
+    </thead>
+    <tbody>
+      {items.map(item => (
+        <tr key={item.id}>
+          <td>{item.name}</td>
+          <td>{item.popularity}</td>
+          <td>{item.followers}</td>
+          <td>{item.id}</td>
+          <td>{item.genres.toString()}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+);
 
-/*
+/* fo
 const Card = ({
   name, popularity, genres, display
 }) => (

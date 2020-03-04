@@ -53,7 +53,7 @@ app.get('/genre', (req, res) => {
     console.log(total);
     totalItems.push(...artists.items);
     const requests = [];
-    for (let i = 50; i < 2000; i += 50) {
+    for (let i = 50; i <= total && i <= 2000; i += 50) {
       requests.push(axios.get(`https://api.spotify.com/v1/search?q=genre:${query}&type=artist&limit=50&offset=${i}`, { headers: { Authorization: token } }));
     }
     Promise.all(requests).then((responses) => {

@@ -3,7 +3,7 @@ import React from 'react';
 const Card = ({
   items
 }) => (
-  <table className="table">
+  <table className="table table-sm">
     <thead>
       <tr>
         <th scope="col">Name</th>
@@ -20,7 +20,7 @@ const Card = ({
           <td>{item.popularity}</td>
           <td>{item.followers}</td>
           <td>{item.id}</td>
-          <td>{item.genres.toString()}</td>
+          <td>{item.genres.join(', ')}</td>
         </tr>
       ))}
     </tbody>

@@ -74,27 +74,32 @@ class App extends React.Component {
     }
     return (
       <div className="w-90 mx-auto" style={{ width: '95%' }}>
-        <form className="mt-4 mb-4">
-          <div className="form-row w-50">
-            <div className="form-group col-md-4">
-              <select className="form-control">
-                <option>Genre</option>
-                <option>Artist</option>
-                <option>Artists</option>
-              </select>
+        <div className="w-75">
+          <h1 className="mt-2">Spotify Search</h1>
+          <form className="mt-4 mb-4">
+            <div className="form-row w-50">
+              <div className="form-group col-md-4">
+                <select className="form-control">
+                  <option>Genre</option>
+                  <option>Artist</option>
+                  <option>Artists</option>
+                </select>
+              </div>
+              <div className="form-group col md-8">
+                <input className="form-control" onChange={this.handleChange} value={query} />
+              </div>
             </div>
-            <div className="form-group col md-8">
-              <input className="form-control" onChange={this.handleChange} value={query} />
+            <div className="form-row">
+              <div className="form-group col-md-4">
+                <button className="btn btn-primary m-1" type="button" onClick={this.handleSubmit}>Submit</button>
+                <button className="btn btn-primary" type="button">Download as CSV</button>
+              </div>
             </div>
-          </div>
-          <div className="form-row">
-            <div className="form-group col-md-4">
-              <button className="btn btn-primary m-1" type="button" onClick={this.handleSubmit}>Submit</button>
-              <button className="btn btn-primary" type="button">Download as CSV</button>
-            </div>
-          </div>
-        </form>
-        {mainContent}
+          </form>
+        </div>
+        <div>
+          {mainContent}
+        </div>
       </div>
     );
   }

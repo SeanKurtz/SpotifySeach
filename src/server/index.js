@@ -41,40 +41,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
 
-
-app.get('/search', (req, res) => {
-  console.log(req.query);
-  const { query, type, limit } = req.query;
-  search(token, query, type, limit).then((response) => {
-    if (type === 'artist') {
-      console.log(response);
-      const { items } = response.artists;
-      const newItems = items.map(item => (
-        { name: item.name, popularity: item.popularity, genres: item.genres }
-      ));
-      res.json(newItems);
-    }
-  });
-});
-
-app.get('/artist', (req, res) => {
-  const { query } = req.query;
-  search(token, query, 'artist', 1).then((response) => {
-    // If we didn't have an exact match on this route, we return an error message.
-    const { items } = response.artists;
-    if (items.length === 0) {
-      res.json({ success: false, message: 'No artists' });
-    }
-    const { name } = items[0];
-    if (name !== query) {
-      res.json({ success: false, message: 'Not an exact match' });
-    }
-    res.json({
-      success: true, message: items
-    });
-  });
-});
-
 app.get('/genre', (req, res) => {
   const { query } = req.query;
   console.log(query);
@@ -107,15 +73,20 @@ app.get('/genre', (req, res) => {
       const filteredItems = finalItems.filter(item => item.genres.includes(queryStr));
       console.log(`Exactly matched ${filteredItems.length} items`);
       // Remove unnecessary data.
-      filteredItems.sort;
+      filteredItems.sort((a, b) => b.popularity - a.popularity);
       const smallerItems = filteredItems.map(item => (
         {
-          name: item.name, popularity: item.popularity, id: item.id, followers: item.followers.total, genres: item.genres
+          name: item.name,
+          popularity: item.popularity,
+          id: item.id,
+          followers: item.followers.total,
+          genres: item.genres
         }
       ));
       // Move selected genre to front.
       for (let i = 0; i < smallerItems.length; i += 1) {
         const genreIndex = smallerItems[i].genres.indexOf(queryStr);
+        // eslint-disable-next-line prefer-destructuring
         smallerItems[i].genres[genreIndex] = smallerItems[i].genres[0];
         smallerItems[i].genres[0] = queryStr;
       }
@@ -131,7 +102,11 @@ app.get('/genre', (req, res) => {
       const sortedItems = filteredItems.sort((a, b) => b.popularity - a.popularity);
       const smallerItems = filteredItems.map(item => (
         {
-          name: item.name, popularity: item.popularity, id: item.id, followers: item.followers.total, genres: item.genres
+          name: item.name,
+          popularity: item.popularity,
+          id: item.id,
+          followers: item.followers.total,
+          genres: item.genres
         }
       ));
       for (let i = 0; i < sortedItems.length; i += 1) {
@@ -165,12 +140,17 @@ app.get('/genrespecific', (req, res) => {
         totalItems.push(...itemResponse.data.artists.items)
       ));
       // Removing all artists without SPECIFIC genre
-      const filteredItems = totalItems.filter(totalItemsItem => totalItemsItem.genres.includes(queryStr));
+      const filteredItems = totalItems.filter(totalItemsItem => (
+        totalItemsItem.genres.includes(queryStr)));
 
       // Removing all extra data from artist objects.
       const smallerItems = filteredItems.map((filteredItemsItem => (
         {
-          name: filteredItemsItem.name, popularity: filteredItemsItem.popularity, id: filteredItemsItem.id, followers: filteredItemsItem.followers, genres: filteredItemsItem.genres
+          name: filteredItemsItem.name,
+          popularity: filteredItemsItem.popularity,
+          id: filteredItemsItem.id,
+          followers: filteredItemsItem.followers,
+          genres: filteredItemsItem.genres
         }
       )));
 

@@ -19,7 +19,7 @@ class App extends React.Component {
   }
 
   async componentDidMount() {
-    const { data } = await axios.get('http://localhost:8080/genre?query=%22singer-songwriter%22');
+    const { data } = await axios.get('https://spotifysearch.seankurtz.net/genre?query=%22singer-songwriter%22');
     if (data.success) {
       this.setState({ results: data.message, loading: false });
     }
@@ -32,7 +32,7 @@ class App extends React.Component {
 
   handleSubmit(e) {
     const { query, } = this.state;
-    const queryStr = `http://localhost:8080/genre?query=%22${query}%22`;
+    const queryStr = `https://spotifysearch.seankurtz.net/genre?query=%22${query}%22`;
     this.setState({ loading: true });
     axios.get(queryStr).then((res) => {
       const { data } = res;

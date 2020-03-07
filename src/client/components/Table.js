@@ -3,7 +3,7 @@ import React from 'react';
 const Table = ({
   items
 }) => (
-  <table className="table table-sm">
+  <table className="table table-sm table-responsive">
     <thead>
       <tr>
         <th scope="col">Name</th>
@@ -17,9 +17,9 @@ const Table = ({
       {items.map((item, i) => (
         <tr key={i.toString()}>
           <td>{item.name}</td>
-          <td>{item.popularity}</td>
-          <td>{item.followers.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')}</td>
-          <td>{item.id}</td>
+          <td className="text-right">{item.popularity}</td>
+          <td className="text-left">{item.followers.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')}</td>
+          <td className="text-left">{item.id}</td>
           <td>{item.genres.join(', ')}</td>
         </tr>
       ))}

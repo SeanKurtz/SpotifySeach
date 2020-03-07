@@ -10,24 +10,16 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      query: 'yacht rock',
+      query: '',
       type: 'genre',
-      loading: true,
+      startup: true,
+      loading: false,
       error: false,
-      results: []
+      results: [],
+      total: 0
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-  }
-
-  async componentDidMount() {
-    const { data } = await axios.get('http://localhost:8080/genre?query=%22yacht rock%22');
-    if (data.success) {
-      console.log(data.message);
-      this.setState({ results: data.message, loading: false });
-    } else {
-      this.setState({ results: [], loading: false, error: true });
-    }
   }
 
   handleChange(event) {
@@ -40,10 +32,12 @@ class App extends React.Component {
 
 
   handleSubmit(event) {
+    event.preventDefault();
     const { query, type } = this.state;
     console.log(type);
     this.setState({ loading: true });
-    let queryStr = `http://localhost:8080/genre?query=%22${query}%22`;
+
+    let queryStr = `http://localhost:8080/genre?query=%22${query.toLowerCase()}%22`;
     if (type === 'artist') {
       queryStr = `http://localhost:8080/${type}?query=${query}`;
     }
@@ -51,9 +45,13 @@ class App extends React.Component {
       const { data } = res;
       console.log(data);
       if (data.success) {
-        this.setState({ results: data.message, loading: false, error: false });
+        this.setState({
+          results: data.message, loading: false, error: false, total: data.total, startup: false
+        });
       } else if (data.message.length === 0 || !data.success) {
-        this.setState({ results: [], loading: false, error: true });
+        this.setState({
+          results: [], loading: false, error: true, total: data.total
+        });
       }
     }).catch((err) => {
       console.log(err);
@@ -63,7 +61,7 @@ class App extends React.Component {
 
   render() {
     const {
-      results, query, loading, error, type
+      results, query, loading, error, type, total, startup
     } = this.state;
 
     const data = results.slice(0);
@@ -87,8 +85,8 @@ class App extends React.Component {
       { label: 'Genres', key: 'genres' },
     ];
 
-    let csvButton = <div />;
-    if (!loading && !error) {
+    let csvButton = <button className="btn btn-secondary" type="button">Download as CSV</button>;
+    if (!loading && !error && !startup) {
       csvButton = <CSVLink data={formattedData} headers={headers} filename={`${type}-search.csv`} className="btn btn-primary">Download as CSV</CSVLink>;
     }
 
@@ -98,15 +96,40 @@ class App extends React.Component {
       mainContent = <h4>Loading...</h4>;
     } else if (error) {
       mainContent = <h4>No matches...</h4>;
+    } else if (startup) {
+      mainContent = (
+        <h4>
+          Welcome to Spotify Search. Enter a genre or select artist from dropdown and enter an artist to begin. Please note that artist names are case-sensitive.
+          {' '}
+        </h4>
+      );
     } else {
-      mainContent = <Table items={results} />;
+      mainContent = (
+        <div>
+          <h4>
+            Found
+            {' '}
+            {' '}
+            {results.length}
+            {' '}
+            exact matches out of
+            {' '}
+            {' '}
+            {total}
+            {' '}
+            {' '}
+            total items in search results.
+          </h4>
+          <Table items={results} />
+        </div>
+      );
     }
 
     return (
       <div className="w-90 mx-auto" style={{ width: '95%' }}>
         <div className="w-75">
           <h1 className="mt-2">Spotify Search</h1>
-          <form className="mt-4 mb-4">
+          <form className="mt-4 mb-4" onSubmit={this.handleSubmit}>
             <div className="form-row w-50">
               <div className="form-group col-md-4">
                 <select className="form-control" value={type} name="type" onChange={this.handleChange}>
@@ -115,12 +138,12 @@ class App extends React.Component {
                 </select>
               </div>
               <div className="form-group col md-8">
-                <input className="form-control" onChange={this.handleChange} value={query} name="query" />
+                <input className="form-control" onChange={this.handleChange} value={query} name="query" placeholder={type === 'genre' ? 'soft rock' : 'Maroon 5'} />
               </div>
             </div>
             <div className="form-row">
               <div className="form-group col-md-4">
-                <button className="btn btn-primary m-1" type="button" onClick={this.handleSubmit}>Submit</button>
+                <button className="btn btn-primary m-1" type="submit">Submit</button>
                 {csvButton}
               </div>
             </div>

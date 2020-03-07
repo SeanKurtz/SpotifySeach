@@ -93,7 +93,7 @@ app.get('/artist', async (req, res) => {
       ));
       console.log(`Sending ${smallerItems.length} items to client`);
       if (smallerItems.length > 0) {
-        res.json({ success: true, message: smallerItems });
+        res.json({ success: true, message: smallerItems, total });
       } else {
         res.json({ success: false, message: 'No matches.' });
       }
@@ -155,79 +155,12 @@ app.get('/genre', async (req, res) => {
       }
       console.log(`Sending ${smallerItems.length} items to client`);
       if (smallerItems.length > 0) {
-        res.json({ success: true, message: smallerItems });
+        res.json({ success: true, message: smallerItems, total });
       } else {
         res.json({ success: false, message: 'No matches.' });
       }
-      /*
-      const sortedItems = filteredItems.sort((a, b) => b.popularity - a.popularity);
-      const smallerItems = filteredItems.map(item => (
-        {
-          name: item.name,
-          popularity: item.popularity,
-          id: item.id,
-          followers: item.followers.total,
-          genres: item.genres
-        }
-      ));
-      for (let i = 0; i < sortedItems.length; i += 1) {
-        const genreIndex = smallerItems[i].genres.indexOf(queryStr);
-        smallerItems[i].genres[genreIndex] = smallerItems[i].genres[0];
-        smallerItems[i].genres[0] = queryStr;
-      }
-      */
     }).catch(err => res.json({ success: false, message: err }));
   }).catch(err => res.json({ success: false, message: err }));
 });
-
-/*
-app.get('/genrespecific', (req, res) => {
-  const { query } = req.query;
-  const queryStr = query.replace(/['"]+/g, '');
-  console.log(query);
-  axios.get(`https://api.spotify.com/v1/search?q=genre:${query}&type=artist&limit=50`, { headers: { Authorization: token } }).then((response) => {
-    const { data } = response;
-    console.log(data);
-    const { artists } = data;
-    const { items, total } = artists;
-    const requests = [];
-    const totalItems = [];
-    for (let i = 50; i <= total || i <= 2000; i += 50) {
-      requests.push(axios.get(`https://api.spotify.com/v1/search?q=genre:${query}&type=artist&limit=50&offset=${i}`, { headers: { Authorization: token } }));
-    }
-    totalItems.push(...items);
-    axios.all(requests).then(axios.spread((...responses) => {
-      responses.map(itemResponse => (
-        totalItems.push(...itemResponse.data.artists.items)
-      ));
-      // Removing all artists without SPECIFIC genre
-      const filteredItems = totalItems.filter(totalItemsItem => (
-        totalItemsItem.genres.includes(queryStr)));
-
-      // Removing all extra data from artist objects.
-      const smallerItems = filteredItems.map((filteredItemsItem => (
-        {
-          name: filteredItemsItem.name,
-          popularity: filteredItemsItem.popularity,
-          id: filteredItemsItem.id,
-          followers: filteredItemsItem.followers,
-          genres: filteredItemsItem.genres
-        }
-      )));
-
-      // Sorting artists based on popularity from greatest to least.
-      const sortedItems = smallerItems.sort((a, b) => b.popularity - a.popularity);
-
-      // Moving the searched genre to front of genre list.
-      for (let i = 0; i < sortedItems.length; i += 1) {
-        const genreIndex = sortedItems[i].genres.indexOf(queryStr);
-        sortedItems[i].genres[genreIndex] = sortedItems[i].genres[0];
-        sortedItems[i].genres[0] = queryStr;
-      }
-      res.json({ success: true, message: sortedItems });
-    })).catch(err => res.json({ success: false, message: err }));
-  }).catch(err => res.json({ success: false, message: err }));
-});
-*/
 
 app.listen(process.env.PORT || 8080, () => console.log(`Listening on port ${process.env.PORT || 8080}!`));

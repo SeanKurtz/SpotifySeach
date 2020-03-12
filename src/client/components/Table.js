@@ -7,9 +7,9 @@ const Table = ({
     <thead>
       <tr>
         <th scope="col">Name</th>
-        <th scope="col">Popularity</th>
-        <th scope="col">Followers</th>
-        <th scope="col">Spotify Id</th>
+        <th scope="col" className="mr-2">Popularity</th>
+        <th scope="col" className="mr-2">Followers</th>
+        <th scope="col" className="mr-2">Spotify Id</th>
         <th scope="col">Genres</th>
       </tr>
     </thead>
@@ -17,9 +17,9 @@ const Table = ({
       {items.map((item, i) => (
         <tr key={i.toString()}>
           <td>{item.name}</td>
-          <td className="text-right">{item.popularity}</td>
-          <td className="text-left">{item.followers.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')}</td>
-          <td className="text-left">{item.id}</td>
+          <td className="text-right mr-2">{item.popularity}</td>
+          <td className="text-right">{item.followers.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')}</td>
+          <td className="text-right">{item.id}</td>
           <td>{item.genres.join(', ')}</td>
         </tr>
       ))}

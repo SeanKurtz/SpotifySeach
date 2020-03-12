@@ -20,6 +20,7 @@ class App extends React.Component {
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.getPlaceholder = this.getPlaceholder.bind(this);
   }
 
   handleChange(event) {
@@ -37,17 +38,28 @@ class App extends React.Component {
     console.log(type);
     this.setState({ loading: true });
 
-    let queryStr = `http://localhost:8080/genre?query=%22${query.toLowerCase()}%22`;
-    if (type === 'artist') {
-      queryStr = `http://localhost:8080/${type}?query=${query}`;
+    let queryStr = '';
+    if (type === 'genre' || type === 'artist') {
+      queryStr = `http://localhost:8080/genre?query=%22${query.toLowerCase().replace(/&/g, '%26')}%22`;
     }
+    if (type === 'artist') {
+      queryStr = `http://localhost:8080/artist?query=${query}&exact=false`;
+    } else if (type === 'artist-byid') {
+      queryStr = `http://localhost:8080/artistId?query=${query}`;
+    }
+    console.log(queryStr);
     axios.get(queryStr).then((res) => {
       const { data } = res;
-      console.log(data);
       if (data.success) {
-        this.setState({
-          results: data.message, loading: false, error: false, total: data.total, startup: false
-        });
+        if (Array.isArray(data.message)) {
+          this.setState({
+            results: data.message, loading: false, error: false, total: data.total, startup: false
+          });
+        } else {
+          this.setState({
+            results: [data.message], loading: false, error: false, total: data.total, startup: false
+          });
+        }
       } else if (data.message.length === 0 || !data.success) {
         this.setState({
           results: [], loading: false, error: true, total: data.total
@@ -59,13 +71,24 @@ class App extends React.Component {
     });
   }
 
+  getPlaceholder() {
+    const { type } = this.state;
+    if (type === 'genre') {
+      return 'soft rock';
+    } if (type === 'artist') {
+      return 'Maroon 5';
+    } if (type === 'artist-byid') {
+      return '3PhoLpVuITZKcymswpck5b';
+    }
+  }
+
   render() {
     const {
       results, query, loading, error, type, total, startup
     } = this.state;
 
-    const data = results.slice(0);
-    const formattedData = data.map((item) => {
+    console.log(results);
+    const formattedData = results.map((item) => {
       const newFollowers = item.followers.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
       return (
         {
@@ -99,7 +122,7 @@ class App extends React.Component {
     } else if (startup) {
       mainContent = (
         <h4>
-          Welcome to Spotify Search. Enter a genre or select artist from dropdown and enter an artist to begin. Please note that artist names are case-sensitive.
+          Welcome to Genre Detector. Seach by Genre, Artist name, or find an artist by Spotify Id.
           {' '}
         </h4>
       );
@@ -112,7 +135,7 @@ class App extends React.Component {
             {' '}
             {results.length}
             {' '}
-            exact matches out of
+            matches out of
             {' '}
             {' '}
             {total}
@@ -128,17 +151,25 @@ class App extends React.Component {
     return (
       <div className="w-90 mx-auto" style={{ width: '95%' }}>
         <div className="w-75">
-          <h1 className="mt-2">Spotify Search</h1>
+          <h1 className="mt-2">Genre Detector</h1>
           <form className="mt-4 mb-4" onSubmit={this.handleSubmit}>
             <div className="form-row w-50">
               <div className="form-group col-md-4">
                 <select className="form-control" value={type} name="type" onChange={this.handleChange}>
                   <option value="genre">Genre</option>
                   <option value="artist">Artist</option>
+                  <option value="artist-byid">Artist (ID)</option>
+
                 </select>
               </div>
               <div className="form-group col md-8">
-                <input className="form-control" onChange={this.handleChange} value={query} name="query" placeholder={type === 'genre' ? 'soft rock' : 'Maroon 5'} />
+                <input
+                  className="form-control"
+                  onChange={this.handleChange}
+                  value={query}
+                  name="query"
+                  placeholder={this.getPlaceholder()}
+                />
               </div>
             </div>
             <div className="form-row">
